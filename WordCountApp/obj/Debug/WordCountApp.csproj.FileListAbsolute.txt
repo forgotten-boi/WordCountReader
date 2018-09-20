@@ -1,0 +1,12 @@
+C:\Users\pjha.JAVRA\Downloads\WordCountApp\WordCountApp\bin\Debug\RevDeBug.setup
+C:\Users\pjha.JAVRA\Downloads\WordCountApp\WordCountApp\bin\Debug\WordCountApp.exe.config
+C:\Users\pjha.JAVRA\Downloads\WordCountApp\WordCountApp\bin\Debug\WordCountApp.exe
+C:\Users\pjha.JAVRA\Downloads\WordCountApp\WordCountApp\bin\Debug\WordCountApp.pdb
+C:\Users\pjha.JAVRA\Downloads\WordCountApp\WordCountApp\obj\Debug\WordCountApp.csprojAssemblyReference.cache
+C:\Users\pjha.JAVRA\Downloads\WordCountApp\WordCountApp\obj\Debug\WordCountApp.WordCounter.resources
+C:\Users\pjha.JAVRA\Downloads\WordCountApp\WordCountApp\obj\Debug\WordCountApp.Properties.Resources.resources
+C:\Users\pjha.JAVRA\Downloads\WordCountApp\WordCountApp\obj\Debug\WordCountApp.csproj.GenerateResource.cache
+C:\Users\pjha.JAVRA\Downloads\WordCountApp\WordCountApp\obj\Debug\WordCountApp.csproj.CoreCompileInputs.cache
+C:\Users\pjha.JAVRA\Downloads\WordCountApp\WordCountApp\obj\Debug\WordCountApp.exe
+C:\Users\pjha.JAVRA\Downloads\WordCountApp\WordCountApp\obj\Debug\WordCountApp.pdb
+C:\Users\pjha.JAVRA\Downloads\WordCountApp\WordCountApp\obj\Debug\RdbLog.txt
