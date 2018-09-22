@@ -14,6 +14,7 @@ using Microsoft.Office.Interop.Word;
 
 using Application = Microsoft.Office.Interop.Word.Application;
 using iTextSharp.text.pdf.parser;
+using System.IO.MemoryMappedFiles;
 
 namespace WordCountApp
 {
@@ -22,9 +23,9 @@ namespace WordCountApp
         public WordCounter()
         {
             InitializeComponent();
-            this.OpenFileDialog1.Filter =
-        "Document (*.doc;*.docx;*.pdf, *.csv)|*.doc;*.docx;*.pdf,*.csv|" +
-        "All files (*.*)|*.*";
+        //    this.OpenFileDialog1.Filter =
+        //"Document (*.doc;*.docx;*.pdf, *.csv)|*.doc;*.docx;*.pdf,*.csv|" +
+        //"All files (*.*)|*.*";
 
             // Allow the user to select multiple images.
             this.OpenFileDialog1.Multiselect = true;
@@ -55,7 +56,7 @@ namespace WordCountApp
                 // Read the files
                 foreach (String strFilePath in OpenFileDialog1.FileNames)
                 {
-           
+
 
                     try
                     {
@@ -77,8 +78,8 @@ namespace WordCountApp
                             //    txtFilePath.Text = strFilePath;
                             //else
                             //{
-                                MessageBox.Show("You need to choose a file!", "File Selection Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                                return;
+                            MessageBox.Show("You need to choose a file!", "File Selection Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                            return;
                             //}
                         }
 
@@ -102,7 +103,7 @@ namespace WordCountApp
                         strDocumentText = "";
 
 
-                        if (System.IO.Path.GetExtension(strFilePath).Equals("pdf"))
+                        if (System.IO.Path.GetExtension(strFilePath).Equals(".pdf", StringComparison.CurrentCultureIgnoreCase))
                         {
                             //string InputFile = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Input.pdf");
 
@@ -110,13 +111,13 @@ namespace WordCountApp
                             string[] TextArrays = ExtractAllTextFromPdf(strFilePath).ToArray();
                             //Count the words
                             //int I = GetWordCountFromString(T);
-                            lngSystemWordCount  = TextArrays.Length;
+                            lngSystemWordCount = TextArrays.Length;
 
-                            for (int i = 1; i <= lngSystemWordCount; i++)
+                            for (int i = 0; i < lngSystemWordCount; i++)
                             {
                                 strSingleWord = TextArrays[i];
 
-                                if (strSingleWord.Replace(" ", "") != "")
+                                if (!string.IsNullOrEmpty(strSingleWord) && strSingleWord.Replace(" ", "") != "")
                                 {
                                     lstAllWords.Items.Add(strSingleWord);
                                     strDocumentText = strDocumentText + " " + strSingleWord;
@@ -125,10 +126,27 @@ namespace WordCountApp
                             }
 
                         }
+                        if (System.IO.Path.GetExtension(strFilePath).Equals(".txt", StringComparison.CurrentCultureIgnoreCase) || System.IO.Path.GetExtension(strFilePath).Equals(".srt", StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            string[] TextArrays = ExtractAllTextWordsFromText(strFilePath);
+                            //Count the words
+                            //int I = GetWordCountFromString(T);
+                            lngSystemWordCount = TextArrays.Length;
 
-                        
+                            for (int i = 0; i < lngSystemWordCount; i++)
+                            {
+                                strSingleWord = TextArrays[i];
+
+                                if (!string.IsNullOrEmpty(strSingleWord) && strSingleWord.Replace(" ", "") != "")
+                                {
+                                    lstAllWords.Items.Add(strSingleWord);
+                                    strDocumentText = strDocumentText + " " + strSingleWord;
+                                    lngTotalWordsCount = lngTotalWordsCount + 1;
+                                }
+                            }
+                        }
                         //doc or docx or microsoft product
-                        if (System.IO.Path.GetExtension(strFilePath).Equals("doc") || System.IO.Path.GetExtension(strFilePath).Equals("docx"))
+                        if (System.IO.Path.GetExtension(strFilePath).Equals(".doc", StringComparison.CurrentCultureIgnoreCase) || System.IO.Path.GetExtension(strFilePath).Equals(".docx",StringComparison.CurrentCultureIgnoreCase))
                         {
 
                             // Open the chosen document  
@@ -138,11 +156,11 @@ namespace WordCountApp
                         
                             //lngTotalWordsCount = 0;
 
-                            for (int i = 1; i <= lngSystemWordCount; i++)
+                            for (int i = 0; i < lngSystemWordCount; i++)
                             {
                                 strSingleWord = doc.Words[i].Text;
 
-                                if (strSingleWord.Replace(" ", "") != "")
+                                if (!string.IsNullOrEmpty(strSingleWord) && strSingleWord.Replace(" ", "") != "")
                                 {
                                     lstAllWords.Items.Add(strSingleWord);
                                     strDocumentText = strDocumentText + " " + strSingleWord;
@@ -246,6 +264,28 @@ namespace WordCountApp
                 return Buf;
             }
         }
+
+        public static string[] ExtractAllTextWordsFromText(string inputFile)
+        {
+            string[] lineWords= { };
+            using (var mappedFile1 = MemoryMappedFile.CreateFromFile(inputFile))
+            {
+                using (Stream mmStream = mappedFile1.CreateViewStream())
+                {
+                    using (StreamReader sr = new StreamReader(mmStream, ASCIIEncoding.ASCII))
+                    {
+                        while (!sr.EndOfStream)
+                        {
+                            var line = sr.ReadLine();
+                            lineWords = line.Split(' ');
+                           
+                        }
+                    }
+                }
+            }
+            return lineWords;
+        }
+
         public static int GetWordCountFromString(string text)
         {
             //Sanity check
