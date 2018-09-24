@@ -108,7 +108,7 @@ namespace WordCountApp
                             //string InputFile = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Input.pdf");
 
                             //Get all the text
-                            string[] TextArrays = ExtractAllTextFromPdf(strFilePath).ToArray();
+                            string[] TextArrays = ExtractAllTextFromPdf(strFilePath);
                             //Count the words
                             //int I = GetWordCountFromString(T);
                             lngSystemWordCount = TextArrays.Length;
@@ -156,7 +156,7 @@ namespace WordCountApp
                         
                             //lngTotalWordsCount = 0;
 
-                            for (int i = 0; i < lngSystemWordCount; i++)
+                            for (int i = 1; i <= lngSystemWordCount; i++)
                             {
                                 strSingleWord = doc.Words[i].Text;
 
@@ -238,7 +238,7 @@ namespace WordCountApp
 
         }
 
-        public static List<string> ExtractAllTextFromPdf(string inputFile)
+        public static string[] ExtractAllTextFromPdf(string inputFile)
         {
             //Sanity checks
             if (string.IsNullOrEmpty(inputFile))
@@ -253,15 +253,15 @@ namespace WordCountApp
                 iTextSharp.text.pdf.PdfReader reader = new iTextSharp.text.pdf.PdfReader(SR);
 
                 //Create a buffer to store text
-                var Buf = new  List<string>();
+                var Buf = new  StringBuilder();
 
                 //Use the PdfTextExtractor to get all of the text on a page-by-page basis
                 for (int i = 1; i <= reader.NumberOfPages; i++)
                 {
-                    Buf.Add(PdfTextExtractor.GetTextFromPage(reader, i));
+                    Buf.Append(PdfTextExtractor.GetTextFromPage(reader, i));
                 }
 
-                return Buf;
+                return Buf.ToString().Split(' ');
             }
         }
 
