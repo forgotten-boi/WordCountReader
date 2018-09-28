@@ -15,6 +15,9 @@ using Microsoft.Office.Interop.Word;
 using Application = Microsoft.Office.Interop.Word.Application;
 using iTextSharp.text.pdf.parser;
 using System.IO.MemoryMappedFiles;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Task = System.Threading.Tasks.Task;
 
 namespace WordCountApp
 {
@@ -111,19 +114,34 @@ namespace WordCountApp
                             string[] TextArrays = ExtractAllTextFromPdf(strFilePath);
                             //Count the words
                             //int I = GetWordCountFromString(T);
+
+                            Stopwatch sw = new Stopwatch();
+
+                            sw.Start();
+
                             lngSystemWordCount = TextArrays.Length;
 
-                            for (int i = 0; i < lngSystemWordCount; i++)
-                            {
-                                strSingleWord = TextArrays[i];
+                            lstAllWords.Items.AddRange(TextArrays);
+                            strDocumentText = string.Join(" ", TextArrays);
+                            sw.Stop();
 
-                                if (!string.IsNullOrEmpty(strSingleWord) && strSingleWord.Replace(" ", "") != "")
-                                {
-                                    lstAllWords.Items.Add(strSingleWord);
-                                    strDocumentText = strDocumentText + " " + strSingleWord;
-                                    lngTotalWordsCount = lngTotalWordsCount + 1;
-                                }
-                            }
+                            Stopwatch sw1 = new Stopwatch();
+
+
+                        
+
+                            //for (int i = 0; i < lngSystemWordCount; i++)
+                            //{
+                            //    strSingleWord = TextArrays[i];
+                             
+
+                            //    if (!string.IsNullOrEmpty(strSingleWord) && strSingleWord.Replace(" ", "") != "")
+                            //    {
+                            //        lstAllWords.Items.Add(strSingleWord);
+                            //        strDocumentText = strDocumentText + " " + strSingleWord;
+                            //        lngTotalWordsCount = lngTotalWordsCount + 1;
+                            //    }
+                            //}
 
                         }
                         if (System.IO.Path.GetExtension(strFilePath).Equals(".txt", StringComparison.CurrentCultureIgnoreCase) || System.IO.Path.GetExtension(strFilePath).Equals(".srt", StringComparison.CurrentCultureIgnoreCase))
@@ -131,19 +149,22 @@ namespace WordCountApp
                             string[] TextArrays = ExtractAllTextWordsFromText(strFilePath);
                             //Count the words
                             //int I = GetWordCountFromString(T);
-                            lngSystemWordCount = TextArrays.Length;
+                            lngSystemWordCount += TextArrays.Length;
 
-                            for (int i = 0; i < lngSystemWordCount; i++)
-                            {
-                                strSingleWord = TextArrays[i];
+                            lstAllWords.Items.AddRange(TextArrays);
+                            strDocumentText += string.Join(" ", TextArrays);
 
-                                if (!string.IsNullOrEmpty(strSingleWord) && strSingleWord.Replace(" ", "") != "")
-                                {
-                                    lstAllWords.Items.Add(strSingleWord);
-                                    strDocumentText = strDocumentText + " " + strSingleWord;
-                                    lngTotalWordsCount = lngTotalWordsCount + 1;
-                                }
-                            }
+                            //for (int i = 0; i < lngSystemWordCount; i++)
+                            //{
+                            //    strSingleWord = TextArrays[i];
+
+                            //    if (!string.IsNullOrEmpty(strSingleWord) && strSingleWord.Replace(" ", "") != "")
+                            //    {
+                            //        lstAllWords.Items.Add(strSingleWord);
+                            //        strDocumentText = strDocumentText + " " + strSingleWord;
+                            //        lngTotalWordsCount = lngTotalWordsCount + 1;
+                            //    }
+                            //}
                         }
                         //doc or docx or microsoft product
                         if (System.IO.Path.GetExtension(strFilePath).Equals(".doc", StringComparison.CurrentCultureIgnoreCase) || System.IO.Path.GetExtension(strFilePath).Equals(".docx",StringComparison.CurrentCultureIgnoreCase))
@@ -151,67 +172,133 @@ namespace WordCountApp
 
                             // Open the chosen document  
                             fileApp = new Application();
+
+
+
+
                             Document doc = fileApp.Documents.Open(strFilePath);
-                            lngSystemWordCount = doc.Words.Count;
-                        
+
+                            //foreach (Paragraph objParagraph in doc.Paragraphs)
+                            //{
+
+                            //    lstAllWords.Items.AddRange(objParagraph.Range.Text.Split(' '));
+                                
+                            //}
+
+                            var TextArrays = doc.Content.Text.Split(' ');
+
+
+                            strDocumentText += string.Join(" ", TextArrays);
+                            lstAllWords.Items.AddRange(TextArrays);
+                            lngSystemWordCount += doc.Words.Count;
+
+                            
+                            
+
+
+
+
+
                             //lngTotalWordsCount = 0;
 
-                            for (int i = 1; i <= lngSystemWordCount; i++)
-                            {
-                                strSingleWord = doc.Words[i].Text;
+                            //for (int i = 1; i <= lngSystemWordCount; i++)
+                            //{
+                            //    strSingleWord = doc.Words[i].Text;
 
-                                if (!string.IsNullOrEmpty(strSingleWord) && strSingleWord.Replace(" ", "") != "")
-                                {
-                                    lstAllWords.Items.Add(strSingleWord);
-                                    strDocumentText = strDocumentText + " " + strSingleWord;
-                                    lngTotalWordsCount = lngTotalWordsCount + 1;
-                                }
-                            }
+                            //    if (!string.IsNullOrEmpty(strSingleWord) && strSingleWord.Replace(" ", "") != "")
+                            //    {
+                            //        lstAllWords.Items.Add(strSingleWord);
+                            //        strDocumentText = strDocumentText + " " + strSingleWord;
+                            //        lngTotalWordsCount = lngTotalWordsCount + 1;
+                            //    }
+                            //}
 
                             // Quit the file processing application
                             fileApp.Quit();
                         }
                         // Count total number of words and display them in the first tab
+
+
                         TabPage1.Text = "All words (" + lngTotalWordsCount + ")";
 
                         // Now count the number of unique words
-                        var distinctWordsArray = strDocumentText.Split(' ').Distinct().ToArray();
+
+                        var totalWordArray = strDocumentText.Split(' ');
+
+                        var distinctWordsArray = totalWordArray.Distinct().ToArray();
 
                         strUniqueWords = "";
                         //lngUniqueWordsCount = 0;
 
-                        for (int i = 0; i < (distinctWordsArray.Length); i++)
-                        {
-                            strSingleWord = distinctWordsArray[i];
+                        lstUniqueWords.Items.AddRange(distinctWordsArray);
+                        strUniqueWords += string.Join(" ", strSingleWord);
+                     
+                        lngUniqueWordsCount = distinctWordsArray.Length;
 
-                            if (strSingleWord.Replace(" ", "") != "")
-                            {
-                                lstUniqueWords.Items.Add(strSingleWord);
-                                strUniqueWords = strUniqueWords + " " + strSingleWord;
-                                lngUniqueWordsCount = lngUniqueWordsCount + 1;
-                            }
-                        }
+
+
+
+                        //for (int i = 0; i < (distinctWordsArray.Length); i++)
+                        //{
+                        //    strSingleWord = distinctWordsArray[i];
+
+                        //    if (strSingleWord.Replace(" ", "") != "")
+                        //    {
+                        //        lstUniqueWords.Items.Add(strSingleWord);
+                        //        strUniqueWords = strUniqueWords + " " + strSingleWord;
+                        //        lngUniqueWordsCount = lngUniqueWordsCount + 1;
+                        //    }
+                        //}
 
                         TabPage2.Text = "Unique words only (" + lngUniqueWordsCount + ")";
 
                         // Now get number of occurrences of each word in the whole file
-                        for (int i = 0; i < (distinctWordsArray.Length); i++)
+
+                        //var uniqueWOrdsList = new List<string>();
+
+                        Func<string, int> textCount = delegate(string text)
                         {
-                            strSingleWord = distinctWordsArray[i];
+                            int countText = 0;
+                            countText = distinctWordsArray.Where(p => p.Equals(text)).ToArray().Length;
+                            return countText;
+                        };
 
-                            if (strSingleWord != "")
-                            {
-                                RegexObj = new Regex(strSingleWord);
-                                SingleWordSearchCount = RegexObj.Matches(strDocumentText).Count;
+                        var uniqueWOrdsList = distinctWordsArray.ToList().GroupBy(p => p).Select(p=> new Pair{ Key = p.Key, Value = textCount(p.Key.ToString()).ToString() });
 
-                                if (SingleWordSearchCount > 0)
-                                    lstFinalResults.Items.Add(strSingleWord + " - " + SingleWordSearchCount);
-                            }
-                        }
+                        Func<Pair, string> textData = delegate (Pair pair)
+                        {
+                            int countText = 0;
+                            countText = totalWordArray.Where(p => p.ToString().Equals(pair.Key)).ToArray().Length;
+                            return pair.Key + "-" + countText;
+                        };
+
+                        uniqueWOrdsList.ToList().ForEach(p =>
+                        {
+                            lstFinalResults.Items.Add(textData(p));
+                        });
+
+                       
+
+
+
+                        //for (int i = 0; i < (distinctWordsArray.Length); i++)
+                        //{
+                        //    strSingleWord = distinctWordsArray[i];
+
+                        //    if (strSingleWord != "")
+                        //    {
+                        //        RegexObj = new Regex(strSingleWord);
+                        //        SingleWordSearchCount = RegexObj.Matches(strDocumentText).Count;
+
+                        //        if (SingleWordSearchCount > 0)
+                        //            lstFinalResults.Items.Add(strSingleWord + " - " + SingleWordSearchCount);
+                        //    }
+                        //}
                     }
                     catch (ArgumentException ex)
                     {
                         Console.Write(ex.Message);
+                        
                     }
 
                     finally
@@ -237,7 +324,12 @@ namespace WordCountApp
 
 
         }
-
+        public class Pair
+        {
+            public string Key { get; set; }
+            public string Value { get; set; }
+            public int ID { get; set; }
+        }
         public static string[] ExtractAllTextFromPdf(string inputFile)
         {
             //Sanity checks
