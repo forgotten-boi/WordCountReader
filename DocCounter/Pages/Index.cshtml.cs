@@ -49,7 +49,7 @@ namespace DocCounter.Pages
         public void OnGet()
         {
         }
-
+        [RequestSizeLimit(100_000_000)]
         public ActionResult OnPostUpload(List<IFormFile> files)
         {
             if(files != null && files.Count > 0)
@@ -75,17 +75,27 @@ namespace DocCounter.Pages
                         WordCounter(fullPath);
                     }
                 }
-                return this.Content("Success" + "lstAllWords:" + lstAllWords.Count + @"\r\n");
+                var wordCount = new WordList()
+                {
+                    AllWordsList = lstAllWords,
+                    FinalResultsList = lstFinalResults,
+                    UniqueWordsList = lstUniqueWords,
+                    IsSuccess = true,
+                    Message = "Success"
+                };
+                //return this.Content("Success" + "lstAllWords:" + lstAllWords.Count + @"\r\n");
+                return new JsonResult(wordCount);
             }
-            return this.Content("Fail");
+            return new JsonResult(new WordList
+            {
+                IsSuccess = false,
+                Message = "Failed"
+            });
         }
 
         public void WordCounter(string strFilePath)
         {
-            //foreach (String strFilePath in fileNames)
-            //{
-
-
+            
                 try
                 {
                     // First reset controls
@@ -108,11 +118,12 @@ namespace DocCounter.Pages
 
                         for (int i = 0; i < lngSystemWordCount; i++)
                         {
-                            strSingleWord = TextArrays[i];
+                            strSingleWord = TextArrays[i].Replace(@"\t"," ")
+                                                .Replace(@"\n"," ").Replace(@"\s"," ").Replace(@"\r"," ");
 
                             if (!string.IsNullOrEmpty(strSingleWord) && strSingleWord.Replace(" ", "") != "")
                             {
-                                lstAllWords.Add(strSingleWord);
+                                lstAllWords.AddRange(strSingleWord.Replace("\n","").Split(" ").ToList());
                                 strDocumentText = strDocumentText + " " + strSingleWord;
                                 lngTotalWordsCount = lngTotalWordsCount + 1;
                             }
@@ -128,11 +139,13 @@ namespace DocCounter.Pages
 
                         for (int i = 0; i < lngSystemWordCount; i++)
                         {
-                            strSingleWord = TextArrays[i];
+                          
+                            strSingleWord = TextArrays[i].Replace(@"\t", " ")
+                                                   .Replace(@"\n", " ").Replace(@"\s", " ").Replace(@"\r", " ");
 
                             if (!string.IsNullOrEmpty(strSingleWord) && strSingleWord.Replace(" ", "") != "")
                             {
-                                lstAllWords.Add(strSingleWord);
+                                lstAllWords.AddRange(strSingleWord.Replace("\n", "").Split(" ").ToList());
                                 strDocumentText = strDocumentText + " " + strSingleWord;
                                 lngTotalWordsCount = lngTotalWordsCount + 1;
                             }
@@ -151,11 +164,13 @@ namespace DocCounter.Pages
 
                         for (int i = 0; i < lngSystemWordCount; i++)
                         {
-                            strSingleWord = doc.Words[i+1].Text;
+                            strSingleWord = doc.Words[i+1].Text.Replace(@"\t", " ")
+                                               .Replace(@"\n", " ").Replace(@"\s", " ").Replace(@"\r", " ");
 
-                            if (!string.IsNullOrEmpty(strSingleWord) && strSingleWord.Replace(" ", "") != "")
+
+                        if (!string.IsNullOrEmpty(strSingleWord) && strSingleWord.Replace(" ", "") != "")
                             {
-                                lstAllWords.Add(strSingleWord);
+                                lstAllWords.AddRange(strSingleWord.Replace("\n", "").Split(" ").ToList());
                                 strDocumentText = strDocumentText + " " + strSingleWord;
                                 lngTotalWordsCount = lngTotalWordsCount + 1;
                             }
@@ -179,7 +194,7 @@ namespace DocCounter.Pages
 
                         if (strSingleWord.Replace(" ", "") != "")
                         {
-                            lstUniqueWords.Add(strSingleWord);
+                            lstUniqueWords.AddRange(strSingleWord.Replace("\n", "").Split(" ").ToList()); 
                             strUniqueWords = strUniqueWords + " " + strSingleWord;
                             lngUniqueWordsCount = lngUniqueWordsCount + 1;
                         }
@@ -211,4 +226,22 @@ namespace DocCounter.Pages
             //}
         }
     }
+
+    public class WordList
+    {
+        public WordList()
+        {
+            this.AllWordsList = new List<string>(); 
+            this.UniqueWordsList = new List<string>(); 
+            this.FinalResultsList = new List<string>(); 
+        }
+        public bool IsSuccess { get; set; }
+        public string Message { get; set; }
+
+        public List<string> AllWordsList { get; set; }
+        public List<string> UniqueWordsList { get; set; }
+        public List<string> FinalResultsList { get; set; }
+      
+    }
+
 }
