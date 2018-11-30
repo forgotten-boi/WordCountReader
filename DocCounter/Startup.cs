@@ -23,6 +23,17 @@ namespace DocCounter
         public void ConfigureServices(IServiceCollection services)
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+
+            services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(x =>
+            {
+                x.ValueLengthLimit = int.MaxValue;
+                x.MultipartBodyLengthLimit = int.MaxValue;
+                x.MultipartHeadersLengthLimit = int.MaxValue;
+            });
+
+
+
             services.AddMvc();
             services.AddAntiforgery(o => o.HeaderName = "XSRF-TOKEN");
         }
@@ -41,6 +52,7 @@ namespace DocCounter
             }
 
             app.UseStaticFiles();
+          
 
             app.UseMvc(routes =>
             {

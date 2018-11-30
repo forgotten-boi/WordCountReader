@@ -75,11 +75,16 @@ namespace DocCounter.Pages
                         WordCounter(fullPath);
                     }
                 }
+                lstAllWords.ForEach(p => p = p.Replace(" ", ""));
+                lstFinalResults.ForEach(p => p = p.Replace(" ", ""));
+                lstUniqueWords.ForEach(p => p = p.Replace(" ", ""));
+               
+
                 var wordCount = new WordList()
                 {
-                    AllWordsList = lstAllWords,
-                    FinalResultsList = lstFinalResults,
-                    UniqueWordsList = lstUniqueWords,
+                    AllWordsList = lstAllWords.FindAll(p=> !p.Equals(" ") && !p.Equals("")),
+                    FinalResultsList = lstFinalResults.FindAll(p => !p.Equals(" ") && !p.Equals("")),
+                    UniqueWordsList = lstUniqueWords.FindAll(p => !p.Equals(" ") && !p.Equals("")),
                     IsSuccess = true,
                     Message = "Success"
                 };

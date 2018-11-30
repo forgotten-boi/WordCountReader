@@ -12,11 +12,44 @@
     <div class="row">
         <div class="col-md-12" style="padding-top:10px;"><input type="button" id="btnUpload" value="Upload" /></div>
     </div>
+
+    <div id="tblInfo">
+        <div>
+            <div class="row panel-heading">
+                <div class="col-md-4">
+                    All Words List( <span id="allWordsCount"></span>)
+                </div>
+                <div class="col-md-4">
+                    Final Results List( <span id="finalResultsCount"></span>)
+                </div>
+                <div class="col-md-4">
+                    Unique Words( <span id="uniqueWordsCount"></span>)
+                </div>
+            
+            </div>
+        
+            <div class="row col-md-12 panel-body">
+                <div id="allWords" class="col-md-4">
+                   
+                </div>
+                <div id="finalResults" class="col-md-4">
+                   
+                </div>
+                <div id="uniqueWords" class="col-md-4">
+                   
+                </div>
+
+            </div>
+          
+        </div>
+    </div>
+
 </form>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script type="text/javascript" language="JavaScript">
         $(document).ready(function () {
+            $("#tblInfo").hide();
             $('#btnUpload').on('click', function () {
                 debugger;
                 var files = $('#fUpload').prop("files");
@@ -37,7 +70,42 @@
                         contentType: false,
                         processData: false,
                         success: function (response) {
-                            alert('File Uploaded Successfully.')
+                            alert('File Uploaded Successfully.');
+                            console.log(response);
+                            debugger;
+                            $("#tblInfo").show();
+                            if (response.isSuccess) {
+                                var allWordsList = response.allWordsList;
+                                var finalResultsList = response.finalResultsList;
+                                var uniqueWordsList = response.uniqueWordsList;
+
+                                var allWords = '';
+                                $.each(allWordsList, function (i, item) {
+                                    if (allWordsList[i] != null && allWordsList[i] != "" && allWordsList[i] != " ")
+                                        allWords += allWordsList[i] + '<br/>'
+                                });
+
+                                var finalWords = '';
+                                $.each(finalResultsList, function (i, item) {
+                                    if (finalResultsList[i] != null && finalResultsList[i] != "" && finalResultsList[i] != " ")
+                                        finalWords += finalResultsList[i] + '<br/>'
+                                });
+
+                                var uniqueWords = '';
+                                $.each(uniqueWordsList, function (i, item) {
+                                    if (uniqueWordsList[i] != null && uniqueWordsList[i] != "" && uniqueWordsList[i]!=" ")
+                                        uniqueWords += uniqueWordsList[i] + '<br/>'
+                                });
+
+                                $("#allWords").append(allWords);
+                                $("#finalResults").append(finalWords);
+                                $("#uniqueWords").append(uniqueWords);
+
+                                $("#allWordsCount").append(allWordsList.length);
+                                $("#finalResultsCount").append(finalResultsCount.length);
+                                $("#uniqueWordsCount").append(uniqueWordsList.length);
+
+                            }
                         }
                     });
                 }
